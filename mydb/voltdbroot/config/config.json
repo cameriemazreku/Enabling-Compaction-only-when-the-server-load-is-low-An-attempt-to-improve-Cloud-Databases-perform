@@ -1,0 +1,5 @@
+{
+    "log4jDst": [{"path": "/home/DisableCompaction/mydb/voltdbroot/log/volt.log"}],
+    "pid": 29572,
+    "workingDir": "/home/DisableCompaction/mydb"
+}
