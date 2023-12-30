@@ -1,0 +1,105 @@
+THP is turned on, Compaction on = 20
+Voltdb(set)((5000000 requests)
+
+ps3201@instance-4:~/voltdb/examples/simple$ echo never|sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+never
+ps3201@instance-4:~/voltdb/examples/simple$ echo never | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
+never
+ps3201@instance-4:~/voltdb/examples/simple$ echo always|sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+always
+ps3201@instance-4:~/voltdb/examples/simple$ echo always | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
+always
+ps3201@instance-4:~/voltdb/examples/simple$ sudo cat  /sys/kernel/mm/transparent_hugepage/enabled
+[always] madvise never
+ps3201@instance-4:~/voltdb/examples/simple$ grep -i  Huge /proc/meminfo
+AnonHugePages:     49152 kB
+ShmemHugePages:        0 kB
+FileHugePages:         0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+ps3201@instance-4:~/voltdb/examples/simple$ cat /proc/sys/vm/compaction_proactiveness
+20
+ps3201@instance-4:~/voltdb/examples/simple$ ./run_client.sh 
+--------------------------------------------------------------------------------
+ Running Performance Benchmark for 5000000 Transactions
+--------------------------------------------------------------------------------
+Dec 27, 2023 5:50:26 AM org.voltcore.logging.VoltUtilLoggingLogger log
+WARNING: Strict java memory checking is enabled, don't do release builds or performance runs with this enabled. Invoke "ant clean" and "ant -Djmemcheck=NO_MEMCHECK" to disable.
+
+Time     Txn/sec Aborts Failures
+-------- ------- ------ --------
+00:00:05  334233      0        0, Avg/95% Latency 6.38/12.35ms
+00:00:10  355556      0        0, Avg/95% Latency 6.34/11.97ms
+
+--------------------------------------------------------------------------------
+ Benchmark Statistics
+--------------------------------------------------------------------------------
+
+Average throughput:              347,681 txns/sec
+Average latency:                    6.34 ms
+10th percentile latency:            2.53 ms
+25th percentile latency:            4.19 ms
+50th percentile latency:            6.02 ms
+75th percentile latency:            7.78 ms
+90th percentile latency:           10.05 ms
+95th percentile latency:           12.10 ms
+99th percentile latency:           16.64 ms
+99.5th percentile latency:         22.02 ms
+99.9th percentile latency:         65.54 ms
+
+--------------------------------------------------------------------------------
+ System Server Statistics
+--------------------------------------------------------------------------------
+
+Reported Internal Avg Latency:      1.14 ms
+
+--------------------------------------------------------------------------------
+ Latency Histogram
+--------------------------------------------------------------------------------
+
+       Value     Percentile TotalCount
+
+        0.10 0.000000000000         12
+        6.02 0.500000000000    2519005
+        7.78 0.750000000000    1243503
+        9.28 0.875000000000     614946
+       11.52 0.937500000000     313079
+       13.12 0.968750000000     154562
+       14.98 0.984375000000      77215
+       18.05 0.992187500000      39332
+       27.01 0.996093750000      18908
+       57.34 0.998046875000       9982
+       66.05 0.999023437500       4743
+       74.24 0.999511718750       2380
+       75.26 0.999755859375       1340
+       76.29 0.999877929688        454
+       78.34 0.999938964844        328
+       79.36 0.999969482422         79
+       81.92 0.999984741211         73
+       82.43 0.999992370605         61
+       82.43 1.000000000000
+#[Mean    =         6.34, StdDeviation   =         4.28]
+#[Max     =        82.43, Total count    =      5000002]
+#[Buckets =           12, SubBuckets     =          256]
+
+
+--------------------------------------------------------------------------------
+ Transaction Results
+--------------------------------------------------------------------------------
+
+  insert_session
+        calls: 5000000
+      commits: 5000000
+    rollbacks: 0
+
+ps3201@instance-4:~/voltdb/examples/simple$ sudo awk '/AnonHugePages/ { if($2>4){print FILENAME " " $0; system("ps -fp " gensub(/.*\/([0-9]+).*/, "\\1", "g", FILENAME))}}' /proc/*/smaps
+/proc/1527/smaps AnonHugePages:     83968 kB
+UID          PID    PPID  C STIME TTY          TIME CMD
+ps3201      1527    1424 10 05:18 pts/0    00:03:32 /usr/bin/java -Xmx20
+/proc/1527/smaps AnonHugePages:     40960 kB
+UID          PID    PPID  C STIME TTY          TIME CMD
+ps3201      1527    1424 10 05:18 pts/0    00:03:32 /usr/bin/java -Xmx20

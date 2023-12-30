@@ -1,0 +1,28 @@
+Source Code and Instructions can be found in the VoltDB github: https://github.com/VoltDB/voltdb
+
+1. Manually Installing and Building VoltDB (On a VM terminal)
+    Run the following commands to clone the VoltDB repository, install Java, ant, and Python
+    1. git clone https://github.com/VoltDB/voltdb.git //Clone the VoltDB repo
+    2. sudo apt update
+    3. sudo apt-get -y install build-essential python3 cmake valgrind ntp ccache git-all python3-httplib2 python-setuptools python3-dev apt-show-versions
+    4. sudo apt-get install openjdk-8-jdk (Java version must be 1.8)
+    5. sudo apt-get install ant ant-optional
+    6. cd voltdb
+    7. ant
+    If execution reads "BUILD SUCCESSFUL", then VoltDB is successfully built and can be used for benchmark testing
+
+2. How to conduct benchmark tests using VoltDB
+    On one terminal window:
+    1. cd ~/voltdb/bin
+    2. ./voltdb start
+    On a seperate terminal window:
+    1. PATH=~/voltdb/bin:$PATH
+    2. Go to benchmark.java:
+        Edit stats = new BenchmarkStats(client,false); (line 59)
+        to stats = new BenchmarkStats(client,true);
+    3. cd ~/voltdb/examples/simple/procedures
+    4. ./compile_procs.sh
+    5. cd ~/voltdb/examples/simple
+    6. sqlcmd < ddl.sql
+    7. ./run_client.sh
+    If results are shown (see voltdb_log_thp_off.txt as an example), benchmark is successful 
